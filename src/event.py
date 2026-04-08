@@ -1,0 +1,2 @@
+from pygame import USEREVENT
+TRIGGER_LOOP = USEREVENT + 1
