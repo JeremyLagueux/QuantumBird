@@ -6,6 +6,10 @@ class Pipe:
     velocity: float
     top_rect: Rect
     bottom_rect: Rect
+    x: int
+    width: int
+    center: float
+    pipe_gap: float
     color: str
     
     def draw(self, screen: Surface) -> None:
@@ -38,5 +42,5 @@ def generate_pipe(pipes: list[Pipe], velocity: int, x: int, width: int,
         top_rect = Rect(x, 0, width, top_height)
         bottom_rect = Rect(x, screen_height - bottom_height, width, bottom_height)
 
-        pipe = Pipe(velocity, top_rect, bottom_rect, color)
+        pipe = Pipe(velocity, top_rect, bottom_rect, x, width, center, pipe_gap, color)
         pipes.append(pipe)
