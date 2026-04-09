@@ -58,7 +58,7 @@ def generate_pipe(pipes: list[Pipe], velocity: int, x: int, width: int,
         pipe.whole_rect = Rect(x, 0, width, screen_height)
         pipes.append(pipe)
 
-def generate_info(last_pipe: Pipe | None, around: float) -> tuple[float, float]:
+def generate_pipe_info(last_pipe: Pipe | None, around: float) -> tuple[float, float]:
     if last_pipe == None:
         return (DEFAULT_CENTER, DEFAULT_PIPE_GAP)
 

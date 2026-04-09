@@ -15,9 +15,9 @@ class Player:
     color: str = "white"
     is_scoring: bool = False
 
-    def _apply_gravity(self, gravity: float = DEFAULT_GRAVITY) -> None:
+    def _apply_gravity(self, dt: float, gravity: float = DEFAULT_GRAVITY) -> None:
         self.velocity += gravity
-        self.y += self.velocity
+        self.y += int(self.velocity * dt)
         self.y = self.height_limit - DEFAULT_PLAYER_RADIUS if self.y > \
                 self.height_limit - DEFAULT_PLAYER_RADIUS else \
                 DEFAULT_PLAYER_RADIUS if self.y < \
@@ -27,8 +27,8 @@ class Player:
     def jump(self, jump_force: float) -> None:
         self.velocity = jump_force
     
-    def process(self, screen: Surface, pipes: list[Pipe]) -> None:
-        self._apply_gravity()
+    def process(self, screen: Surface, dt: float, pipes: list[Pipe]) -> None:
+        self._apply_gravity(dt)
         self._draw(screen)
         rect = Rect(self.x, self.y, DEFAULT_PLAYER_RADIUS, DEFAULT_PLAYER_RADIUS)
         top: list[Rect] = []
