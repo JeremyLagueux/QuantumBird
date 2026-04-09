@@ -1,24 +1,35 @@
 from pygame import Surface, Rect, draw
-from dataclasses import dataclass
+from .defaults import DEFAULT_CENTER, DEFAULT_PIPE_GAP, DEFAULT_VELOCITY, DEFAULT_MAX_CENTER, \
+    DEFAULT_MAX_PIPE_GAP, DEFAULT_MIN_PIPE_GAP, DEFAULT_MIN_CENTER
+from random import uniform
 
-@dataclass
 class Pipe:
-    velocity: float
-    top_rect: Rect
-    bottom_rect: Rect
-    x: int
-    width: int
-    center: float
-    pipe_gap: float
-    color: str
+    def __init__(self, top_rect: Rect, bottom_rect: Rect, x: int, width: int, color: str,
+                 velocity: int = DEFAULT_VELOCITY, pipe_gap: float = DEFAULT_PIPE_GAP,
+                 center: float = DEFAULT_CENTER):
+        self.top_rect = top_rect
+        self.bottom_rect = bottom_rect
+        self.whole_rect: Rect
+        self.x = x
+        self.width = width
+        self.color = color
+
+        self.velocity = velocity
+        self.pipe_gap = pipe_gap
+        self.center = center
     
-    def draw(self, screen: Surface) -> None:
+    def process(self, screen: Surface, dt: float) -> None:
+        self._draw(screen)
+        self._move(dt)
+    
+    def _draw(self, screen: Surface) -> None:
         draw.rect(screen, self.color, self.top_rect)
         draw.rect(screen, self.color, self.bottom_rect)
 
-    def move(self, dt) -> None:
-        self.top_rect.x -= self.velocity * dt
-        self.bottom_rect.x -= self.velocity * dt
+    def _move(self, dt: float) -> None:
+        self.top_rect.x -= int(self.velocity * dt)
+        self.bottom_rect.x -= int(self.velocity * dt)
+        self.whole_rect.x -= int(self.velocity * dt)
 
 def generate_pipe(pipes: list[Pipe], velocity: int, x: int, width: int,
                   center: float, pipe_gap: float, color: str, screen: Surface,
@@ -42,5 +53,26 @@ def generate_pipe(pipes: list[Pipe], velocity: int, x: int, width: int,
         top_rect = Rect(x, 0, width, top_height)
         bottom_rect = Rect(x, screen_height - bottom_height, width, bottom_height)
 
-        pipe = Pipe(velocity, top_rect, bottom_rect, x, width, center, pipe_gap, color)
+        pipe = Pipe(top_rect = top_rect, bottom_rect = bottom_rect, x = x, width = width,
+                    color = color, velocity = velocity, center = center, pipe_gap = pipe_gap)
+        pipe.whole_rect = Rect(x, 0, width, screen_height)
         pipes.append(pipe)
+
+def generate_info(last_pipe: Pipe | None, around: float) -> tuple[float, float]:
+    if last_pipe == None:
+        return (DEFAULT_CENTER, DEFAULT_PIPE_GAP)
+
+    center = uniform(last_pipe.center - around, last_pipe.center + around)
+    pipe_gap = uniform(last_pipe.pipe_gap - around, last_pipe.pipe_gap + around)
+
+    if center < DEFAULT_MIN_CENTER:
+        center = DEFAULT_MIN_CENTER
+    if pipe_gap < DEFAULT_MIN_PIPE_GAP:
+        pipe_gap = DEFAULT_MIN_PIPE_GAP
+
+    if center > DEFAULT_MAX_CENTER:
+        center = DEFAULT_MAX_CENTER
+    if pipe_gap > DEFAULT_MAX_PIPE_GAP:
+        pipe_gap = DEFAULT_MAX_PIPE_GAP
+
+    return (center, pipe_gap)

@@ -1,9 +1,8 @@
-from src.pipe import Pipe, generate_pipe
-from src.pipe_generation import generate_info
+from src.pipe import Pipe, generate_pipe, generate_info
 from src.player import Player
 from src.button import Button
-from src.defaults import DEFAULT_NUM_PIPES, DEFAULT_GRAVITY, DEFAULT_JUMP_FORCE, DEFAULT_PLAYER_RADIUS
-from src.event import TRIGGER_LOOP
+from src.defaults import DEFAULT_NUM_PIPES, DEFAULT_JUMP_FORCE
+from src.event import TRIGGER_LOOP, RESET
 
 import pygame
 
@@ -21,17 +20,14 @@ def loop_game(screen: pygame.Surface, clock: pygame.time.Clock, dt: float,
     screen.fill("purple")
 
     if player != None:
-        player.draw(screen)
-
-        player.apply_gravity(DEFAULT_GRAVITY)
+        player.process(screen, pipes)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
             player.jump(DEFAULT_JUMP_FORCE)
     
     for pipe in pipes:
-        pipe.draw(screen)
-        pipe.move(dt)
+        pipe.process(screen, dt)
 
 def title_screen(screen: pygame.Surface, buttons: list[Button]) -> None:
     screen.fill("black")
@@ -39,13 +35,20 @@ def title_screen(screen: pygame.Surface, buttons: list[Button]) -> None:
         button.process(screen)
     
 def init_title_screen(font: pygame.font.Font | None) -> list[Button]:
-    play_button: Button = Button(pygame.Rect(100, 100, 100, 100), "text", play, font, "blue")
+    play_button: Button = Button(rect = pygame.Rect(100, 100, 100, 100), text = "text",
+                                 fun = post_event, arg = TRIGGER_LOOP, font = font,
+                                 color = "blue")
     return [play_button]
 
-def play() -> None:
-    event = pygame.event.Event(TRIGGER_LOOP)
+def post_event(evt: int) -> None:
+    event = pygame.event.Event(evt)
     pygame.event.post(event)
+
+def reset_game(players: list[Player], pipes: list[Pipe]) -> None:
+    players.clear()
+    pipes.clear()
     
 def init_game(players: list[Player], screen: pygame.Surface) -> None:
-    player: Player = Player(screen.get_width() * 0.3, screen.get_height() / 2, 0, "white")
+    player: Player = Player(x = screen.get_width() * 0.3, y = screen.get_height() / 2,
+                            height_limit = screen.get_height(), fun = post_event)
     players.append(player)

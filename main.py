@@ -1,16 +1,24 @@
+from src.button import Button
+from src.player import Player
+from src.pipe import Pipe
+from src.game import loop_game, title_screen, init_title_screen, init_game, \
+        reset_game
+from src.event import TRIGGER_LOOP, RESET, INCREMENT_SCORE
+
 import pygame
 
-def jump(player_pos: pygame.Vector2, jump_height: int) -> None:
-    player_pos.y -= jump_height
 
-# pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
-clock = pygame.time.Clock()
-running = True
-dt = 0
-
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+screen: pygame.Surface = pygame.display.set_mode((1280, 720))
+clock: pygame.time.Clock = pygame.time.Clock()
+running: bool = True
+dt: float = 0
+players: list[Player] = []
+pipes: list[Pipe] = []
+score: int = 0
+font: None = None #pygame.font.SysFont('IBM Plex', 20)
+loop: bool = False
+title_buttons: list[Button] = init_title_screen(font)
 
 while running:
     # poll for events
@@ -18,27 +26,20 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
-
-    pygame.draw.circle(screen, "red", player_pos, 40)
-
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_w]:
-        player_pos.y -= 300 * dt
-    if keys[pygame.K_s]:
-        player_pos.y += 300 * dt
-    if keys[pygame.K_a]:
-        player_pos.x -= 300 * dt
-    if keys[pygame.K_d]:
-        player_pos.x += 300 * dt
-    if keys[pygame.K_SPACE]:
-        jump(player_pos, 50)
-
-    # gravity
-    player_pos.y += 9.8
-
+        if event.type == TRIGGER_LOOP:
+            loop = True
+            init_game(players, screen)
+        if event.type == RESET:
+            loop = False
+            reset_game(players, pipes)
+        if event.type == INCREMENT_SCORE:
+            score += 1
+            print(f"Score : {score}")
+    
+    if loop:
+        loop_game(screen, clock, dt, pipes, players)
+    else:
+        title_screen(screen, title_buttons)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
