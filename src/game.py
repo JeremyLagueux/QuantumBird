@@ -1,8 +1,8 @@
 from src.pipe import Pipe, generate_pipe
-from src.player import Player
+from src.player import Player, sort_players_by_color
 from src.button import Button
 from src.defaults import DEFAULT_PLAYER_RADIUS, DEFAULT_NUM_EFFECTS
-from src.event import TRIGGER_LOOP, PAUSE
+from src.event import TRIGGER_LOOP, PAUSE, post_event
 from src.effect import Effect, generate_effect
 
 import pygame
@@ -23,14 +23,20 @@ def loop_game(screen: pygame.Surface, clock: pygame.time.Clock, dt: float,
 
     keys = pygame.key.get_pressed()
     correct_keys = [pygame.K_1 + i for i in range(len(players))]
-    for i in range(len(players)):
-        players[i].process(screen, dt, pipes)
+    dict_player = sort_players_by_color(players)
+    for i, c_players in enumerate(dict_player.values()):
+        for player in c_players:
+            player.process(screen, dt, pipes)
 
-        if keys[correct_keys[i]]:
-            players[i].jump()
+            if keys[correct_keys[i]]:
+                player.jump()
     
     if keys[pygame.K_j]:
         post_event(PAUSE)
+
+    if keys[pygame.K_SPACE]:
+        for player in players:
+            player.jump()
 
     for pipe in pipes:
         pipe.process(screen, dt)
@@ -48,10 +54,6 @@ def init_title_screen(font: pygame.font.Font | None) -> list[Button]:
                                  fun = post_event, arg = TRIGGER_LOOP, font = font,
                                  color = "blue")
     return [play_button]
-
-def post_event(evt: int) -> None:
-    event = pygame.event.Event(evt)
-    pygame.event.post(event)
 
 def reset_game(players: list[Player], pipes: list[Pipe], effects: list[Effect]) -> None:
     players.clear()

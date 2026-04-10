@@ -58,8 +58,10 @@ def generate_effect(screen: Surface, effects: list[Effect], num_effects: int,
                     effect_gap: float) -> None:
     info = generate_info(0.3)
     # Remove effects that are outside the view
-    if len(effects) > 0 and effects[-1].rect.x + effects[-1].rect.width < 0:
-        effects.pop()
+    if len(effects) > 0:
+        if effects[-1].rect.x + effects[-1].rect.width < 0 and \
+                effects[-1].shape == "circle" or effects[-1].rect.x < 0:
+            effects.pop()
 
     if len(effects) < num_effects and \
             (len(effects) > 0 and \
@@ -67,7 +69,7 @@ def generate_effect(screen: Surface, effects: list[Effect], num_effects: int,
             len(effects) == 0:
         rect = Rect(screen.get_width() + info.width,
                     screen.get_height() / 2, info.width, info.width)
-        effect = Effect(rect, info.shape, info.velocity, info.fun, info.args)
+        effect = Effect(rect, info.shape, info.velocity, info.fun, info.args, info.color)
         effects.append(effect)
 
 @dataclass

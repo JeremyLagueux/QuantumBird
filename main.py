@@ -5,6 +5,7 @@ from src.game import loop_game, title_screen, init_title_screen, init_game, \
         reset_game
 from src.event import TRIGGER_LOOP, RESET, INCREMENT_SCORE, PAUSE
 from src.effect import Effect
+from src.defaults import DEFAULT_MAX_NUM_PIPES, DEFAULT_NUM_PIPES, DEFAULT_EFFECTS_THRESHOLD
 
 import pygame
 
@@ -22,10 +23,9 @@ font: None = None #pygame.font.SysFont('IBM Plex', 20)
 loop: bool = False
 pause: bool = False
 is_effects: bool = False
-num_pipes: int = 1
+num_pipes: int = DEFAULT_NUM_PIPES
 title_buttons: list[Button] = init_title_screen(font)
 exp: list[int] = [i**2 for i in range(3, 10)]
-print(exp)
 
 while running:
     # poll for events
@@ -40,13 +40,13 @@ while running:
             loop = False
             reset_game(players, pipes, effects)
             score = 0
-            num_pipes = 1
+            num_pipes = DEFAULT_NUM_PIPES
             is_effects = False
         if event.type == INCREMENT_SCORE:
             score += 1
-            if score == 5:
+            if score == DEFAULT_EFFECTS_THRESHOLD:
                 is_effects = True
-            if score in exp:
+            if score in exp and num_pipes < DEFAULT_MAX_NUM_PIPES:
                 num_pipes += 1
             print(f"Score : {score}")
         if event.type == PAUSE:
