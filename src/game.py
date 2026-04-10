@@ -1,22 +1,22 @@
-from src.pipe import Pipe, generate_pipe, generate_pipe_info
+from src.pipe import Pipe, generate_pipe
 from src.player import Player
 from src.button import Button
-from src.defaults import DEFAULT_NUM_PIPES, DEFAULT_PLAYER_RADIUS, DEFAULT_NUM_EFFECTS
+from src.defaults import DEFAULT_PLAYER_RADIUS, DEFAULT_NUM_EFFECTS
 from src.event import TRIGGER_LOOP, PAUSE
 from src.effect import Effect, generate_effect
 
 import pygame
 
 def loop_game(screen: pygame.Surface, clock: pygame.time.Clock, dt: float,
-              pipes: list[Pipe], players:list[Player], effects: list[Effect]) -> None:
-    center, pipe_gap = generate_pipe_info(pipes[-1] if len(pipes) > 0 else None, 0.1)
+              pipes: list[Pipe], players:list[Player], effects: list[Effect],
+              is_effects: bool, num_pipes: int) -> None:
 
     # Generate pipes outside screen width
-    generate_pipe(pipes = pipes, velocity = 500, x = screen.get_width(),
-                  width = 100, center = center, pipe_gap = pipe_gap, color = "white",
-                  screen = screen, gap = 500, num_pipes = DEFAULT_NUM_PIPES)
+    generate_pipe(pipes = pipes, x = screen.get_width(), width = 100, screen = screen,
+                  num_pipes = num_pipes, players = players)
 
-    generate_effect(screen, effects, DEFAULT_NUM_EFFECTS, 500)
+    if is_effects:
+        generate_effect(screen, effects, DEFAULT_NUM_EFFECTS, 500)
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("purple")
@@ -36,7 +36,7 @@ def loop_game(screen: pygame.Surface, clock: pygame.time.Clock, dt: float,
         pipe.process(screen, dt)
         
     for effect in effects:
-        effect.process(screen, dt, players)
+        effect.process(screen, dt, effects, players)
 
 def title_screen(screen: pygame.Surface, buttons: list[Button]) -> None:
     screen.fill("black")
@@ -53,16 +53,13 @@ def post_event(evt: int) -> None:
     event = pygame.event.Event(evt)
     pygame.event.post(event)
 
-def reset_game(players: list[Player], pipes: list[Pipe]) -> None:
+def reset_game(players: list[Player], pipes: list[Pipe], effects: list[Effect]) -> None:
     players.clear()
     pipes.clear()
+    effects.clear()
     
 def init_game(players: list[Player], screen: pygame.Surface) -> None:
-    rect1 = pygame.Rect(screen.get_width() * 0.3, screen.get_height() / 2,
+    rect = pygame.Rect(screen.get_width() * 0.3, screen.get_height() / 2,
                        DEFAULT_PLAYER_RADIUS, DEFAULT_PLAYER_RADIUS)
-    rect2 = pygame.Rect(screen.get_width() * 0.3, screen.get_height() / 8,
-                       DEFAULT_PLAYER_RADIUS, DEFAULT_PLAYER_RADIUS)
-    player1: Player = Player(rect1, height_limit = screen.get_height(), fun = post_event)
-    player2: Player = Player(rect2, height_limit = screen.get_height(), fun = post_event)
+    player1: Player = Player(rect, height_limit = screen.get_height(), fun = post_event)
     players.append(player1)
-    # players.append(player2)

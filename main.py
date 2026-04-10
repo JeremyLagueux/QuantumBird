@@ -21,7 +21,11 @@ score: int = 0
 font: None = None #pygame.font.SysFont('IBM Plex', 20)
 loop: bool = False
 pause: bool = False
+is_effects: bool = False
+num_pipes: int = 1
 title_buttons: list[Button] = init_title_screen(font)
+exp: list[int] = [i**2 for i in range(3, 10)]
+print(exp)
 
 while running:
     # poll for events
@@ -34,9 +38,16 @@ while running:
             init_game(players, screen)
         if event.type == RESET:
             loop = False
-            reset_game(players, pipes)
+            reset_game(players, pipes, effects)
+            score = 0
+            num_pipes = 1
+            is_effects = False
         if event.type == INCREMENT_SCORE:
             score += 1
+            if score == 5:
+                is_effects = True
+            if score in exp:
+                num_pipes += 1
             print(f"Score : {score}")
         if event.type == PAUSE:
             pause = True if not pause else False
@@ -44,7 +55,7 @@ while running:
     if loop:
         if pause:
             dt = 0
-        loop_game(screen, clock, dt, pipes, players, effects)
+        loop_game(screen, clock, dt, pipes, players, effects, is_effects, num_pipes)
     else:
         title_screen(screen, title_buttons)
 

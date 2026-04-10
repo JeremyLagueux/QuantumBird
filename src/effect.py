@@ -1,7 +1,7 @@
 from pygame import Surface, draw, Rect
 from .player import Player
-from .defaults import DEFAULT_EFFECT_RADIUS, DEFAULT_EFFECT_VELOCITY, EFFECT_SHAPES, \
-    DEFAULT_EFFECT_MAX_VELOCITY, DEFAULT_EFFECT_MIN_VELOCITY, EFFECT_COLORS
+from .defaults import DEFAULT_EFFECT_RADIUS, DEFAULT_EFFECT_VELOCITY, \
+    DEFAULT_EFFECT_MAX_VELOCITY, DEFAULT_EFFECT_MIN_VELOCITY
 from . import effect_functions as e_fun
 
 from typing import Callable
@@ -20,10 +20,10 @@ class Effect:
         self.args = args
         self.collided = False
 
-    def process(self, screen: Surface, dt: float, players: list[Player]) -> None:
+    def process(self, screen: Surface, dt: float, effects: list[Effect], players: list[Player]) -> None:
         self._draw(screen)
         self._move(dt)
-        self._collide(players)
+        self._collide(effects, players)
 
     def _draw(self, screen: Surface) -> None:
         match self.shape:
@@ -41,7 +41,7 @@ class Effect:
         x -= int(dt * dx)
         self.rect = Rect(x, y, width, height)
 
-    def _collide(self, players: list[Player]) -> None:
+    def _collide(self, effects: list[Effect], players: list[Player]) -> None:
         rects = [player.rect for player in players]
         res = self.rect.collidelist(rects)
 
@@ -50,6 +50,7 @@ class Effect:
             self.collided = True
             if self.fun != None and self.args != None:
                 self.fun(self, players, res, *self.args)
+                effects.remove(self)
         elif res == -1:
             self.collided = False
 
@@ -81,12 +82,14 @@ class EffectInfo:
 def generate_info(around: float) -> EffectInfo:
     width: int = int(uniform(DEFAULT_EFFECT_RADIUS - around * DEFAULT_EFFECT_RADIUS,
                              DEFAULT_EFFECT_RADIUS + around * DEFAULT_EFFECT_RADIUS))
-    shape: str = choice(EFFECT_SHAPES)
-    color: str = choice(EFFECT_COLORS)
     velocity: tuple[int, int] = (
             int(uniform(DEFAULT_EFFECT_VELOCITY - around * DEFAULT_EFFECT_VELOCITY,
                         DEFAULT_EFFECT_VELOCITY + around * DEFAULT_EFFECT_VELOCITY)), 0)
     fun_num = choice(range(len(e_fun.EFFECT_FUNCTIONS)))
+    shape: str = e_fun.EFFECT_SHAPE[fun_num]
+    if shape == "rect":
+        width *= 2
+    color: str = e_fun.EFFECT_COLOR[fun_num]
     fun: Callable | None = e_fun.EFFECT_FUNCTIONS[fun_num]
     args: tuple | None = e_fun.EFFECT_FUNCTION_ARGS[fun_num]
 

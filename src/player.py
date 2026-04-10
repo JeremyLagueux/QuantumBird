@@ -4,6 +4,9 @@ from .event import RESET, INCREMENT_SCORE
 from .pipe import Pipe
 from pygame import Surface, draw, Rect
 from typing import Callable
+from random import shuffle
+
+_colors = ["white", "blue", "red", "green", "purle"]
 
 @dataclass
 class Player:
@@ -42,7 +45,7 @@ class Player:
         top_res = self.rect.collidelist(top)
         bottom_res = self.rect.collidelist(bottom)
         whole_res = self.rect.collidelist(whole)
-        if top_res != -1 or bottom_res != -1:
+        if (top_res != -1 or bottom_res != -1) and pipes[top_res].color == self.color:
             self.fun(RESET)
         if whole_res != -1 and not self.is_scoring:
             self.is_scoring = True
@@ -52,3 +55,7 @@ class Player:
 
     def _draw(self, screen: Surface) -> None:
         draw.circle(screen, self.color, (self.rect.x, self.rect.y), DEFAULT_PLAYER_RADIUS)
+
+def get_color() -> str:
+    shuffle(_colors)
+    return _colors.pop()
