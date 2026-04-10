@@ -5,32 +5,36 @@ from .pipe import Pipe
 from pygame import Surface, draw, Rect, colordict
 from typing import Callable
 from random import shuffle
+import pygame
 
 _colors = list(colordict.THECOLORS.keys())
+
 
 @dataclass
 class Player:
     rect: Rect
     height_limit: float
     fun: Callable
+    sprite: Surface
     velocity: float = 0
     jump_force: float = DEFAULT_JUMP_FORCE
     gravity: float = DEFAULT_GRAVITY
     color: str = "white"
     is_scoring: bool = False
+    angle: float = 0
 
     def _apply_gravity(self, dt: float) -> None:
         self.velocity += self.gravity
         self.rect.y += int(self.velocity * dt)
-        self.rect.y = int(self.height_limit - self.rect.width if self.rect.y > \
-                self.height_limit - self.rect.width else \
-                self.rect.width if self.rect.y < \
-                self.rect.width else \
-                self.rect.y)
+        self.rect.y = int(
+            self.height_limit - self.rect.width
+            if self.rect.y > self.height_limit - self.rect.width
+            else self.rect.width if self.rect.y < self.rect.width else self.rect.y
+        )
 
     def jump(self) -> None:
         self.velocity = self.jump_force
-    
+
     def process(self, screen: Surface, dt: float, pipes: list[Pipe]) -> None:
         self._apply_gravity(dt)
         self._draw(screen)
@@ -41,7 +45,7 @@ class Player:
             top.append(pipe.top_rect)
             bottom.append(pipe.bottom_rect)
             whole.append(pipe.whole_rect)
-        
+
         top_res = self.rect.collidelist(top)
         bottom_res = self.rect.collidelist(bottom)
         whole_res = self.rect.collidelist(whole)
@@ -55,7 +59,14 @@ class Player:
             self.is_scoring = False
 
     def _draw(self, screen: Surface) -> None:
-        draw.circle(screen, self.color, (self.rect.x, self.rect.y), DEFAULT_PLAYER_RADIUS)
+        if type(self.sprite) != int:
+            target_angle = max(-30, min(60, self.velocity * 3))
+            self.angle += (target_angle - self.angle) * 0.1
+
+            rotated_sprite = pygame.transform.rotate(self.sprite, -self.angle)
+            rotated_rect = rotated_sprite.get_rect(center=self.rect.center)
+            screen.blit(rotated_sprite, rotated_rect)
+
 
 def sort_players_by_color(players: list[Player]) -> dict[str, list[Player]]:
     c_players = {}
@@ -63,6 +74,7 @@ def sort_players_by_color(players: list[Player]) -> dict[str, list[Player]]:
         c_players.setdefault(player.color, [])
         c_players[player.color].append(player)
     return c_players
+
 
 def get_color() -> str:
     shuffle(_colors)

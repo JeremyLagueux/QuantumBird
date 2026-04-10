@@ -7,13 +7,27 @@ from src.effect import Effect, generate_effect
 
 import pygame
 
-def loop_game(screen: pygame.Surface, clock: pygame.time.Clock, dt: float,
-              pipes: list[Pipe], players:list[Player], effects: list[Effect],
-              is_effects: bool, num_pipes: int) -> None:
+
+def loop_game(
+    screen: pygame.Surface,
+    clock: pygame.time.Clock,
+    dt: float,
+    pipes: list[Pipe],
+    players: list[Player],
+    effects: list[Effect],
+    is_effects: bool,
+    num_pipes: int,
+) -> None:
 
     # Generate pipes outside screen width
-    generate_pipe(pipes = pipes, x = screen.get_width(), width = 100, screen = screen,
-                  num_pipes = num_pipes, players = players)
+    generate_pipe(
+        pipes=pipes,
+        x=screen.get_width(),
+        width=100,
+        screen=screen,
+        num_pipes=num_pipes,
+        players=players,
+    )
 
     if is_effects:
         generate_effect(screen, effects, DEFAULT_NUM_EFFECTS, 500)
@@ -30,7 +44,7 @@ def loop_game(screen: pygame.Surface, clock: pygame.time.Clock, dt: float,
 
             if keys[correct_keys[i]]:
                 player.jump()
-    
+
     if keys[pygame.K_j]:
         post_event(PAUSE)
 
@@ -40,28 +54,46 @@ def loop_game(screen: pygame.Surface, clock: pygame.time.Clock, dt: float,
 
     for pipe in pipes:
         pipe.process(screen, dt)
-        
+
     for effect in effects:
         effect.process(screen, dt, effects, players)
+
 
 def title_screen(screen: pygame.Surface, buttons: list[Button]) -> None:
     screen.fill("black")
     for button in buttons:
         button.process(screen)
-    
+
+
 def init_title_screen(font: pygame.font.Font | None) -> list[Button]:
-    play_button: Button = Button(rect = pygame.Rect(100, 100, 100, 100), text = "text",
-                                 fun = post_event, arg = TRIGGER_LOOP, font = font,
-                                 color = "blue")
+    play_button: Button = Button(
+        rect=pygame.Rect(100, 100, 100, 100),
+        text="text",
+        fun=post_event,
+        arg=TRIGGER_LOOP,
+        font=font,
+        color="blue",
+    )
     return [play_button]
+
 
 def reset_game(players: list[Player], pipes: list[Pipe], effects: list[Effect]) -> None:
     players.clear()
     pipes.clear()
     effects.clear()
-    
+
+
 def init_game(players: list[Player], screen: pygame.Surface) -> None:
-    rect = pygame.Rect(screen.get_width() * 0.3, screen.get_height() / 2,
-                       DEFAULT_PLAYER_RADIUS, DEFAULT_PLAYER_RADIUS)
-    player1: Player = Player(rect, height_limit = screen.get_height(), fun = post_event)
+    rect = pygame.Rect(
+        screen.get_width() * 0.3,
+        screen.get_height() / 2,
+        DEFAULT_PLAYER_RADIUS,
+        DEFAULT_PLAYER_RADIUS,
+    )
+
+    player_sprite = pygame.image.load("src/sprites/quantumBird.png").convert_alpha()
+    player_sprite = pygame.transform.scale(player_sprite, (100, 100))
+    player1: Player = Player(
+        rect, sprite=player_sprite, height_limit=screen.get_height(), fun=post_event
+    )
     players.append(player1)
