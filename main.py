@@ -1,14 +1,17 @@
 from src.button import Button
 from src.player import Player
 from src.pipe import Pipe
-from src.game import loop_game, title_screen, init_title_screen, init_game, \
-        reset_game
+from src.game import loop_game, title_screen, init_title_screen, init_game, reset_game
 from src.event import TRIGGER_LOOP, RESET, INCREMENT_SCORE, PAUSE
 from src.effect import Effect
-from src.defaults import DEFAULT_MAX_NUM_PIPES, DEFAULT_NUM_PIPES, DEFAULT_EFFECTS_THRESHOLD
+from src.defaults import (
+    DEFAULT_MAX_NUM_PIPES,
+    DEFAULT_NUM_PIPES,
+    DEFAULT_EFFECTS_THRESHOLD,
+)
 
 import pygame
-
+from src.parrallax import ParallaxLayer
 
 pygame.init()
 screen: pygame.Surface = pygame.display.set_mode((1280, 720))
@@ -19,13 +22,21 @@ players: list[Player] = []
 pipes: list[Pipe] = []
 effects: list[Effect] = []
 score: int = 0
-font: None = None #pygame.font.SysFont('IBM Plex', 20)
+font: None = None  # pygame.font.SysFont('IBM Plex', 20)
 loop: bool = False
 pause: bool = False
 is_effects: bool = False
 num_pipes: int = DEFAULT_NUM_PIPES
 title_buttons: list[Button] = init_title_screen(font)
 exp: list[int] = [i**2 for i in range(3, 10)]
+backgrounds = [
+    ParallaxLayer(
+        "src/sprites/blue-back.png", 60, screen.get_width(), screen.get_height()
+    ),
+    ParallaxLayer(
+        "src/sprites/blue-stars.png", 40, screen.get_width(), screen.get_height()
+    ),
+]
 
 while running:
     # poll for events
@@ -51,11 +62,21 @@ while running:
             print(f"Score : {score}")
         if event.type == PAUSE:
             pause = True if not pause else False
-    
+
     if loop:
         if pause:
             dt = 0
-        loop_game(screen, clock, dt, pipes, players, effects, is_effects, num_pipes)
+        loop_game(
+            screen,
+            clock,
+            dt,
+            pipes,
+            players,
+            effects,
+            is_effects,
+            num_pipes,
+            backgrounds,
+        )
     else:
         title_screen(screen, title_buttons)
 

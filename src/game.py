@@ -5,6 +5,8 @@ from src.defaults import DEFAULT_PLAYER_RADIUS, DEFAULT_NUM_EFFECTS
 from src.event import TRIGGER_LOOP, PAUSE, post_event
 from src.effect import Effect, generate_effect
 
+from src.parrallax import ParallaxLayer
+
 import pygame
 
 
@@ -17,6 +19,7 @@ def loop_game(
     effects: list[Effect],
     is_effects: bool,
     num_pipes: int,
+    backgrounds: list[ParallaxLayer],
 ) -> None:
 
     # Generate pipes outside screen width
@@ -33,7 +36,9 @@ def loop_game(
         generate_effect(screen, effects, DEFAULT_NUM_EFFECTS, 500)
 
     # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
+    for bg in backgrounds:
+        bg.update(dt)
+        bg.draw(screen)
 
     keys = pygame.key.get_pressed()
     correct_keys = [pygame.K_1 + i for i in range(len(players))]
