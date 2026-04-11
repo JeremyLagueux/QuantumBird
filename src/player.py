@@ -65,6 +65,7 @@ class Player:
 
             rotated_sprite = pygame.transform.rotate(self.sprite, -self.angle)
             rotated_rect = rotated_sprite.get_rect(center=self.rect.center)
+
             screen.blit(rotated_sprite, rotated_rect)
 
 

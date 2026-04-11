@@ -27,7 +27,7 @@ loop: bool = False
 pause: bool = False
 is_effects: bool = False
 num_pipes: int = DEFAULT_NUM_PIPES
-title_buttons: list[Button] = init_title_screen(font)
+title_buttons: list[Button] = init_title_screen(font, screen)
 exp: list[int] = [i**2 for i in range(3, 10)]
 backgrounds = [
     ParallaxLayer(
@@ -37,7 +37,7 @@ backgrounds = [
         "src/sprites/blue-stars.png", 40, screen.get_width(), screen.get_height()
     ),
 ]
-
+time_since_start = 0
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -46,7 +46,7 @@ while running:
             running = False
         if event.type == TRIGGER_LOOP:
             loop = True
-            init_game(players, screen)
+            init_game(players, screen, backgrounds)
         if event.type == RESET:
             loop = False
             reset_game(players, pipes, effects)
@@ -64,6 +64,7 @@ while running:
             pause = True if not pause else False
 
     if loop:
+        time_since_start += 1
         if pause:
             dt = 0
         loop_game(
@@ -78,6 +79,7 @@ while running:
             backgrounds,
             font,
             score=score,
+            time_since_start=time_since_start,
         )
     else:
         title_screen(screen, title_buttons)

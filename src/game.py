@@ -22,17 +22,19 @@ def loop_game(
     backgrounds: list[ParallaxLayer],
     font: pygame.font,
     score,
+    time_since_start,
 ) -> None:
 
     # Generate pipes outside screen width
-    generate_pipe(
-        pipes=pipes,
-        x=screen.get_width(),
-        width=100,
-        screen=screen,
-        num_pipes=num_pipes,
-        players=players,
-    )
+    if time_since_start > 20:
+        generate_pipe(
+            pipes=pipes,
+            x=screen.get_width(),
+            width=100,
+            screen=screen,
+            num_pipes=num_pipes,
+            players=players,
+        )
 
     if is_effects:
         generate_effect(screen, effects, DEFAULT_NUM_EFFECTS, 500)
@@ -71,14 +73,30 @@ def loop_game(
 
 def title_screen(screen: pygame.Surface, buttons: list[Button]) -> None:
     screen.fill("black")
+    bg = ParallaxLayer(
+        "src/sprites/blue-back.png", 60, screen.get_width(), screen.get_height()
+    )
+    bg2 = ParallaxLayer(
+        "src/sprites/blue-stars.png", 40, screen.get_width(), screen.get_height()
+    )
+
+    bg.draw(screen)
+    bg2.draw(screen)
     for button in buttons:
         button.process(screen)
 
 
-def init_title_screen(font: pygame.font.Font | None) -> list[Button]:
+def init_title_screen(
+    font: pygame.font.Font | None, screen: pygame.Surface
+) -> list[Button]:
     play_button: Button = Button(
-        rect=pygame.Rect(100, 100, 100, 100),
-        text="text",
+        rect=pygame.Rect(
+            (screen.get_width() - 250) / 2,
+            (screen.get_height() - 50) / 2,
+            250,
+            100,
+        ),
+        text="START",
         fun=post_event,
         arg=TRIGGER_LOOP,
         font=font,
@@ -93,7 +111,9 @@ def reset_game(players: list[Player], pipes: list[Pipe], effects: list[Effect]) 
     effects.clear()
 
 
-def init_game(players: list[Player], screen: pygame.Surface) -> None:
+def init_game(
+    players: list[Player], screen: pygame.Surface, backgrounds: list[ParallaxLayer]
+) -> None:
     rect = pygame.Rect(
         screen.get_width() * 0.3,
         screen.get_height() / 2,
@@ -103,7 +123,44 @@ def init_game(players: list[Player], screen: pygame.Surface) -> None:
 
     player_sprite = pygame.image.load("src/sprites/quantumBird.png").convert_alpha()
     player_sprite = pygame.transform.scale(player_sprite, (100, 100))
+    animate_sprite_entry(player_sprite, screen, rect, backgrounds)
     player1: Player = Player(
         rect, sprite=player_sprite, height_limit=screen.get_height(), fun=post_event
     )
     players.append(player1)
+
+
+def animate_sprite_entry(
+    sprite: pygame.Surface,
+    screen: pygame.Surface,
+    target_rect: pygame.Rect,
+    backgrounds: list[ParallaxLayer],
+) -> None:
+    clock = pygame.time.Clock()
+
+    temp_rect = sprite.get_rect()
+    temp_rect.y = target_rect.y
+
+    x = float(-temp_rect.width)
+    speed = 600.0
+
+    while x < target_rect.x:
+        dt = clock.tick(60) / 1000.0
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        x += speed * dt
+        if x > target_rect.x:
+            x = float(target_rect.x)
+
+        temp_rect.x = round(x)
+
+        for bg in backgrounds:
+            bg.update(dt)
+            bg.draw(screen)
+
+        screen.blit(sprite, temp_rect)
+        pygame.display.flip()
