@@ -22,7 +22,7 @@ players: list[Player] = []
 pipes: list[Pipe] = []
 effects: list[Effect] = []
 score: int = 0
-font: None = None  # pygame.font.SysFont('IBM Plex', 20)
+font = pygame.font.SysFont("IBM Plex", 100)
 loop: bool = False
 pause: bool = False
 is_effects: bool = False
@@ -76,6 +76,8 @@ while running:
             is_effects,
             num_pipes,
             backgrounds,
+            font,
+            score=score,
         )
     else:
         title_screen(screen, title_buttons)

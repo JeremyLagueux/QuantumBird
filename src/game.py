@@ -20,6 +20,8 @@ def loop_game(
     is_effects: bool,
     num_pipes: int,
     backgrounds: list[ParallaxLayer],
+    font: pygame.font,
+    score,
 ) -> None:
 
     # Generate pipes outside screen width
@@ -62,6 +64,9 @@ def loop_game(
 
     for effect in effects:
         effect.process(screen, dt, effects, players)
+
+    score_text = font.render(f"Score : {score}", True, (255, 255, 255))
+    screen.blit(score_text, (20, 20))
 
 
 def title_screen(screen: pygame.Surface, buttons: list[Button]) -> None:
