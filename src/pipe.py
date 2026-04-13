@@ -1,4 +1,4 @@
-from pygame import Surface, Rect, draw
+from pygame import Surface, Rect
 import pygame
 from .defaults import (
     DEFAULT_CENTER,
@@ -9,6 +9,8 @@ from .defaults import (
     DEFAULT_MIN_CENTER,
     DEFAULT_VELOCITY,
 )
+from .utils import create_sprite_from_str
+
 from random import uniform, choice
 from dataclasses import dataclass
 
@@ -36,7 +38,11 @@ class Pipe:
         self.pipe_gap = pipe_gap
         self.center = center
 
-        self.sprite = pygame.image.load("src/sprites/quantumPipe.png").convert_alpha()
+        top_sprite = create_sprite_from_str("src/sprites/quantumPipeWhite.png",
+                                            color, top_rect.width, top_rect.height)
+        self.top_sprite = pygame.transform.flip(top_sprite, False, True)
+        self.bottom_sprite = create_sprite_from_str("src/sprites/quantumPipeWhite.png",
+                                                    color, bottom_rect.width, bottom_rect.height)
 
     def process(self, screen: Surface, dt: float) -> None:
         self._draw(screen)
@@ -44,17 +50,10 @@ class Pipe:
 
     def _draw(self, screen: Surface) -> None:
         if self.top_rect.height > 0:
-            top_sprite = pygame.transform.scale(
-                self.sprite, (self.top_rect.width, self.top_rect.height)
-            )
-            top_sprite = pygame.transform.flip(top_sprite, False, True)
-            screen.blit(top_sprite, self.top_rect)
+            screen.blit(self.top_sprite, self.top_rect)
 
         if self.bottom_rect.height > 0:
-            bottom_sprite = pygame.transform.scale(
-                self.sprite, (self.bottom_rect.width, self.bottom_rect.height)
-            )
-            screen.blit(bottom_sprite, self.bottom_rect)
+            screen.blit(self.bottom_sprite, self.bottom_rect)
 
     def _move(self, dt: float) -> None:
         self.top_rect.x -= int(self.velocity * dt)
@@ -62,14 +61,8 @@ class Pipe:
         self.whole_rect.x -= int(self.velocity * dt)
 
 
-def generate_pipe(
-    pipes: list[Pipe],
-    num_pipes: int,
-    x: int,
-    width: int,
-    screen: Surface,
-    players: list,
-) -> None:
+def generate_pipe(pipes: list[Pipe], num_pipes: int, x: int, width: int,
+    screen: Surface, players: list,) -> None:
     # Remove pipes that are out of bounds
     for pipe in pipes:
         if pipe.top_rect.x + pipe.top_rect.width < 0:
@@ -97,8 +90,8 @@ def generate_pipe(
         top_height = screen_height * pipe_info.center - height_gap
         bottom_height = screen_height * (1 - pipe_info.center) - height_gap
 
-        top_rect = Rect(x, 0, width, top_height)
-        bottom_rect = Rect(x, screen_height - bottom_height, width, bottom_height)
+        top_rect = Rect(x, 0, abs(width), abs(top_height))
+        bottom_rect = Rect(x, abs(screen_height - bottom_height), abs(width), abs(bottom_height))
 
         pipe = Pipe(
             top_rect=top_rect,

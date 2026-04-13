@@ -1,27 +1,33 @@
-from dataclasses import dataclass
-from .defaults import DEFAULT_PLAYER_RADIUS, DEFAULT_GRAVITY, DEFAULT_JUMP_FORCE
+from .defaults import DEFAULT_GRAVITY, DEFAULT_JUMP_FORCE
 from .event import RESET, INCREMENT_SCORE
 from .pipe import Pipe
-from pygame import Surface, draw, Rect, colordict
+from .utils import create_sprite_from_surface
+
+from pygame import Surface, Rect, colordict
 from typing import Callable
 from random import shuffle
 import pygame
 
 _colors = list(colordict.THECOLORS.keys())
 
-
-@dataclass
 class Player:
-    rect: Rect
-    height_limit: float
-    fun: Callable
-    sprite: Surface
-    velocity: float = 0
-    jump_force: float = DEFAULT_JUMP_FORCE
-    gravity: float = DEFAULT_GRAVITY
-    color: str = "white"
-    is_scoring: bool = False
-    angle: float = 0
+    def __init__(self, rect: Rect, height_limit: float, fun: Callable,
+                 sprite: Surface, velocity: float = 0, jump_force: float = DEFAULT_JUMP_FORCE,
+                 gravity: float = DEFAULT_GRAVITY, color: str = "white",
+                 is_scoring: bool = False, angle: float = 0
+                 ):
+        self.rect = rect
+        self.height_limit = height_limit
+        self.fun = fun
+        self.velocity = velocity
+        self.jump_force = jump_force
+        self.gravity = gravity
+        self.color = color
+        self.is_scoring = is_scoring
+        self.angle = angle
+        
+        self.sprite = create_sprite_from_surface(sprite, color)
+
 
     def _apply_gravity(self, dt: float) -> None:
         self.velocity += self.gravity
@@ -66,6 +72,8 @@ class Player:
             rotated_sprite = pygame.transform.rotate(self.sprite, -self.angle)
             rotated_rect = rotated_sprite.get_rect(center=self.rect.center)
 
+            if self.gravity < 0:
+                rotated_sprite = pygame.transform.flip(rotated_sprite, False, True)
             screen.blit(rotated_sprite, rotated_rect)
 
 

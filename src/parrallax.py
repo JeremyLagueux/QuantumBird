@@ -1,12 +1,13 @@
 import pygame
 from pygame import Surface
+from pathlib import Path
 
 
 class ParallaxLayer:
     def __init__(
         self, image_path: str, speed: float, screen_width: int, screen_height: int
     ):
-        self.image = pygame.image.load(image_path).convert_alpha()
+        self.image = pygame.image.load(Path(image_path)).convert_alpha()
         self.image = pygame.transform.scale(self.image, (screen_width, screen_height))
         self.speed = speed
         self.x1 = 0

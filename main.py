@@ -1,14 +1,25 @@
 from src.button import Button
 from src.player import Player
 from src.pipe import Pipe
-from src.game import loop_game, title_screen, init_title_screen, init_game, reset_game
-from src.event import TRIGGER_LOOP, RESET, INCREMENT_SCORE, PAUSE
+from src.game import (
+        loop_game,
+        title_screen,
+        init_title_screen,
+        init_game,
+        reset_game
+        )
+from src.event import (
+        TRIGGER_LOOP,
+        RESET,
+        INCREMENT_SCORE,
+        PAUSE,
+        )
 from src.effect import Effect
 from src.defaults import (
-    DEFAULT_MAX_NUM_PIPES,
-    DEFAULT_NUM_PIPES,
-    DEFAULT_EFFECTS_THRESHOLD,
-)
+        DEFAULT_MAX_NUM_PIPES,
+        DEFAULT_NUM_PIPES,
+        DEFAULT_EFFECTS_THRESHOLD,
+        )
 
 import pygame
 from src.parrallax import ParallaxLayer
@@ -29,6 +40,7 @@ is_effects: bool = False
 num_pipes: int = DEFAULT_NUM_PIPES
 title_buttons: list[Button] = init_title_screen(font, screen)
 exp: list[int] = [i**2 for i in range(3, 10)]
+print(exp)
 backgrounds = [
     ParallaxLayer(
         "src/sprites/blue-back.png", 60, screen.get_width(), screen.get_height()
@@ -38,6 +50,7 @@ backgrounds = [
     ),
 ]
 time_since_start = 0
+
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -59,6 +72,7 @@ while running:
                 is_effects = True
             if score in exp and num_pipes < DEFAULT_MAX_NUM_PIPES:
                 num_pipes += 1
+                print(num_pipes)
             print(f"Score : {score}")
         if event.type == PAUSE:
             pause = True if not pause else False

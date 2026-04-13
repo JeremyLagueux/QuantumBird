@@ -8,6 +8,7 @@ from .defaults import (
     DEFAULT_EFFECT_MIN_VELOCITY,
 )
 from . import effect_functions as e_fun
+from .utils import create_sprite_from_str
 
 from typing import Callable
 from dataclasses import dataclass
@@ -22,6 +23,7 @@ class Effect:
         velocity: tuple[int, int],
         fun: Callable | None,
         args: tuple | None,
+        sprite: Surface | None,
         color: str = "white",
     ) -> None:
         self.rect = rect
@@ -31,6 +33,7 @@ class Effect:
         self.fun = fun
         self.args = args
         self.collided = False
+        self.sprite = sprite
 
     def process(
         self, screen: Surface, dt: float, effects: list[Effect], players: list[Player]
@@ -40,13 +43,16 @@ class Effect:
         self._collide(effects, players)
 
     def _draw(self, screen: Surface) -> None:
-        match self.shape:
-            case "circle":
-                draw.circle(
-                    screen, self.color, (self.rect.x, self.rect.y), self.rect.width
-                )
-            case "rect":
-                draw.rect(screen, self.color, self.rect)
+        if self.sprite == None:
+            match self.shape:
+                case "circle":
+                    draw.circle(
+                        screen, self.color, (self.rect.x, self.rect.y), self.rect.width
+                    )
+                case "rect":
+                    draw.rect(screen, self.color, self.rect)
+        else:
+            screen.blit(self.sprite, self.rect)
 
     def _move(self, dt: float) -> None:
         x, y, width, height = self.rect
@@ -70,16 +76,12 @@ class Effect:
 
 
 def generate_effect(
-    screen: Surface, effects: list[Effect], num_effects: int, effect_gap: float
+        screen: Surface, effects: list[Effect], num_effects: int, effect_gap: float
 ) -> None:
     info = generate_info(0.3)
     # Remove effects that are outside the view
     if len(effects) > 0:
-        if (
-            effects[-1].rect.x + effects[-1].rect.width < 0
-            and effects[-1].shape == "circle"
-            or effects[-1].rect.x < 0
-        ):
+        if (effects[-1].rect.x + effects[-1].rect.width < 0):
             effects.pop()
 
     if (
@@ -93,8 +95,13 @@ def generate_effect(
             info.width,
             info.width,
         )
+    
+        if info.sprite != None:
+            sprite = create_sprite_from_str(info.sprite, info.color, info.width, info.width)
+        else:
+            sprite = None
         effect = Effect(
-            rect, info.shape, info.velocity, info.fun, info.args, info.color
+            rect, info.shape, info.velocity, info.fun, info.args, sprite, info.color
         )
         effects.append(effect)
 
@@ -103,6 +110,7 @@ def generate_effect(
 class EffectInfo:
     width: int
     shape: str
+    sprite: str
     color: str
     velocity: tuple[int, int]
     fun: Callable | None
@@ -130,6 +138,7 @@ def generate_info(around: float) -> EffectInfo:
     if shape == "rect":
         width *= 2
     color: str = e_fun.EFFECT_COLOR[fun_num]
+    sprite: str = e_fun.EFFECT_SPRITE[fun_num]
     fun: Callable | None = e_fun.EFFECT_FUNCTIONS[fun_num]
     args: tuple | None = e_fun.EFFECT_FUNCTION_ARGS[fun_num]
 
@@ -140,4 +149,4 @@ def generate_info(around: float) -> EffectInfo:
         dx = DEFAULT_EFFECT_MIN_VELOCITY
     velocity = (dx, 0)
 
-    return EffectInfo(width, shape, color, velocity, fun, args)
+    return EffectInfo(width, shape, sprite, color, velocity, fun, args)

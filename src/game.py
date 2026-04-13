@@ -1,7 +1,10 @@
 from src.pipe import Pipe, generate_pipe
 from src.player import Player, sort_players_by_color
 from src.button import Button
-from src.defaults import DEFAULT_PLAYER_RADIUS, DEFAULT_NUM_EFFECTS
+from src.defaults import (
+        DEFAULT_PLAYER_RADIUS,
+        DEFAULT_NUM_EFFECTS,
+        )
 from src.event import TRIGGER_LOOP, PAUSE, post_event
 from src.effect import Effect, generate_effect
 
@@ -20,7 +23,7 @@ def loop_game(
     is_effects: bool,
     num_pipes: int,
     backgrounds: list[ParallaxLayer],
-    font: pygame.font,
+    font: pygame.font.Font,
     score,
     time_since_start,
 ) -> None:
@@ -121,11 +124,11 @@ def init_game(
         DEFAULT_PLAYER_RADIUS,
     )
 
-    player_sprite = pygame.image.load("src/sprites/quantumBird.png").convert_alpha()
-    player_sprite = pygame.transform.scale(player_sprite, (100, 100))
-    animate_sprite_entry(player_sprite, screen, rect, backgrounds)
+    sprite = pygame.image.load("src/sprites/quantumBirdWhite.png").convert_alpha()
+    sprite = pygame.transform.scale(sprite, (100, 100))
+    animate_sprite_entry(sprite, screen, rect, backgrounds)
     player1: Player = Player(
-        rect, sprite=player_sprite, height_limit=screen.get_height(), fun=post_event
+        rect, sprite=sprite, height_limit=screen.get_height(), fun=post_event
     )
     players.append(player1)
 
