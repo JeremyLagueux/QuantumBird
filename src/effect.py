@@ -9,11 +9,11 @@ from .defaults import (
     DEFAULT_EFFECT_HEIGHT
 )
 from . import effect_functions as e_fun
-from .utils import create_sprite_from_str
+from .utils import create_sprite_from_str, create_sprite_from_str_dual
 
 from typing import Callable
 from dataclasses import dataclass
-from random import choice, uniform
+from random import choice, uniform, choices
 
 
 class Effect:
@@ -111,6 +111,10 @@ def generate_effect(
     
         if info.sprite != None:
             sprite = create_sprite_from_str(info.sprite, info.color, info.width, info.width)
+            match info.shape:
+                case "2_rect":
+                    sprite = create_sprite_from_str_dual(info.sprite, info.args[0], info.args[1], info.width, info.width)
+                case _: ...
         else:
             sprite = None
         effect = Effect(
@@ -151,7 +155,7 @@ def generate_info(around: float, players: list[Player]) -> EffectInfo:
         ),
         0,
     )
-    fun_num = choice(range(len(e_fun.EFFECT_FUNCTIONS)))
+    fun_num: int = choices(range(len(e_fun.EFFECT_FUNCTIONS)), weights = e_fun.EFFECT_DISTRIBUTION, k = 1)[0]
     fun: Callable | None = e_fun.EFFECT_FUNCTIONS[fun_num]
     args: tuple | None = e_fun.EFFECT_FUNCTION_ARGS[fun_num]
     shape: str = e_fun.EFFECT_SHAPE[fun_num]

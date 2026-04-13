@@ -28,6 +28,7 @@ def measure(effect, players, i) -> None:
     
     for player in dict_players[color]:
         players.remove(player)
+    add_color(color)
     if len(players) == 0:
         post_event(RESET)
 
@@ -41,7 +42,8 @@ def new_qubit(effect, players, i) -> None:
 def cx_gate(effect, players, i, color1: str, color2: str) -> None:
     dict_players = sort_players_by_color(players)
 
-    if dict_players[color1][0].gravity < 0:
+    which: int = choice(range(len(dict_players[color1])))
+    if dict_players[color1][which].gravity < 0:
         for player in dict_players[color2]:
             player.velocity = 0
             player.gravity = - player.gravity
@@ -56,5 +58,11 @@ def x_gate(effect, players, i) -> None:
 EFFECT_FUNCTIONS = [hadamard_effect, measure, new_qubit, x_gate, cx_gate]
 EFFECT_SHAPE = ["rect", "rect", "circle", "rect", "rect"]
 EFFECT_COLOR = ["white", "white", "blue", "white", "white"]
-EFFECT_SPRITE = ["src/sprites/Hadamard.png", "src/sprites/Meter.png", None, "src/sprites/XGate.png", None]
+EFFECT_SPRITE = ["src/sprites/Hadamard.png", "src/sprites/Meter.png", None, "src/sprites/XGate.png", "src/sprites/XGate.png"]
 EFFECT_FUNCTION_ARGS = [(), (), (), (), ()]
+EFFECT_DISTRIBUTION = [0.25, 0.10, 0.20, 0.25, 0.10]
+# EFFECT_FUNCTIONS = [new_qubit, x_gate, cx_gate]
+# EFFECT_SHAPE = ["circle", "rect", "rect"]
+# EFFECT_COLOR = ["blue", "white", "white"]
+# EFFECT_SPRITE = [None, "src/sprites/XGate.png", "src/sprites/XGate.png"]
+# EFFECT_FUNCTION_ARGS = [(), (), ()]

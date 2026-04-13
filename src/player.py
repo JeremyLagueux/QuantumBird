@@ -8,7 +8,17 @@ from typing import Callable
 from random import shuffle
 import pygame
 
-_colors = list(colordict.THECOLORS.keys())
+# _colors = list(colordict.THECOLORS.keys())
+_colors = [
+        "blue",
+        "orange",
+        "green",
+        "yellow",
+        "red",
+        "purple",
+        "magenta",
+        "cyan",
+        ]
 
 class Player:
     def __init__(self, rect: Rect, height_limit: float, fun: Callable,
@@ -89,3 +99,6 @@ def get_color() -> str:
     shuffle(_colors)
     color = _colors.pop()
     return color
+
+def add_color(color: str) -> None:
+    _colors.append(color)
