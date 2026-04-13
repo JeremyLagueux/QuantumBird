@@ -26,6 +26,7 @@ def loop_game(
     font: pygame.font.Font,
     score,
     time_since_start,
+    pipe_sprite: pygame.Surface
 ) -> None:
 
     # Generate pipes outside screen width
@@ -37,10 +38,11 @@ def loop_game(
             screen=screen,
             num_pipes=num_pipes,
             players=players,
+            sprite = pipe_sprite
         )
 
     if is_effects:
-        generate_effect(screen, effects, DEFAULT_NUM_EFFECTS, 500)
+        generate_effect(screen, effects, DEFAULT_NUM_EFFECTS, 500, players)
 
     # fill the screen with a color to wipe away anything from last frame
     for bg in backgrounds:

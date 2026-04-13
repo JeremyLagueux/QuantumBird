@@ -39,8 +39,7 @@ pause: bool = False
 is_effects: bool = False
 num_pipes: int = DEFAULT_NUM_PIPES
 title_buttons: list[Button] = init_title_screen(font, screen)
-exp: list[int] = [i**2 for i in range(3, 10)]
-print(exp)
+exp: list[int] = [i**2 for i in range(2, 10, 2)]
 backgrounds = [
     ParallaxLayer(
         "src/sprites/blue-back.png", 60, screen.get_width(), screen.get_height()
@@ -50,6 +49,7 @@ backgrounds = [
     ),
 ]
 time_since_start = 0
+pipe_sprite: pygame.Surface = pygame.image.load("src/sprites/quantumPipeWhite.png")
 
 while running:
     # poll for events
@@ -72,8 +72,6 @@ while running:
                 is_effects = True
             if score in exp and num_pipes < DEFAULT_MAX_NUM_PIPES:
                 num_pipes += 1
-                print(num_pipes)
-            print(f"Score : {score}")
         if event.type == PAUSE:
             pause = True if not pause else False
 
@@ -94,6 +92,7 @@ while running:
             font,
             score=score,
             time_since_start=time_since_start,
+            pipe_sprite = pipe_sprite
         )
     else:
         title_screen(screen, title_buttons)

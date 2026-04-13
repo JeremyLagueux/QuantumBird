@@ -9,7 +9,7 @@ from .defaults import (
     DEFAULT_MIN_CENTER,
     DEFAULT_VELOCITY,
 )
-from .utils import create_sprite_from_str
+from .utils import create_sprite_from_surface
 
 from random import uniform, choice
 from dataclasses import dataclass
@@ -24,6 +24,7 @@ class Pipe:
         width: int,
         color: str,
         velocity: int,
+        sprite: Surface,
         pipe_gap: float = DEFAULT_PIPE_GAP,
         center: float = DEFAULT_CENTER,
     ):
@@ -38,11 +39,9 @@ class Pipe:
         self.pipe_gap = pipe_gap
         self.center = center
 
-        top_sprite = create_sprite_from_str("src/sprites/quantumPipeWhite.png",
-                                            color, top_rect.width, top_rect.height)
+        top_sprite = create_sprite_from_surface(sprite, color, top_rect.width, top_rect.height)
         self.top_sprite = pygame.transform.flip(top_sprite, False, True)
-        self.bottom_sprite = create_sprite_from_str("src/sprites/quantumPipeWhite.png",
-                                                    color, bottom_rect.width, bottom_rect.height)
+        self.bottom_sprite = create_sprite_from_surface(sprite, color, bottom_rect.width, bottom_rect.height)
 
     def process(self, screen: Surface, dt: float) -> None:
         self._draw(screen)
@@ -62,7 +61,7 @@ class Pipe:
 
 
 def generate_pipe(pipes: list[Pipe], num_pipes: int, x: int, width: int,
-    screen: Surface, players: list,) -> None:
+                  screen: Surface, players: list, sprite: Surface) -> None:
     # Remove pipes that are out of bounds
     for pipe in pipes:
         if pipe.top_rect.x + pipe.top_rect.width < 0:
@@ -102,6 +101,7 @@ def generate_pipe(pipes: list[Pipe], num_pipes: int, x: int, width: int,
             velocity=pipe_info.velocity,
             center=pipe_info.center,
             pipe_gap=pipe_info.pipe_gap,
+            sprite = sprite
         )
         pipe.whole_rect = Rect(x, 0, width, screen_height)
         pipes.append(pipe)
