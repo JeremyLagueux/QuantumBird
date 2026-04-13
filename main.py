@@ -25,7 +25,7 @@ import pygame
 from src.parrallax import ParallaxLayer
 
 pygame.init()
-screen: pygame.Surface = pygame.display.set_mode((1280, 720))
+screen: pygame.Surface = pygame.display.set_mode(pygame.display.get_desktop_sizes()[0])
 clock: pygame.time.Clock = pygame.time.Clock()
 running: bool = True
 dt: float = 0
@@ -59,13 +59,13 @@ while running:
             running = False
         if event.type == TRIGGER_LOOP:
             loop = True
+            score = 0
+            is_effects = False
+            num_pipes = DEFAULT_NUM_PIPES
             init_game(players, screen, backgrounds)
         if event.type == RESET:
             loop = False
             reset_game(players, pipes, effects)
-            score = 0
-            num_pipes = DEFAULT_NUM_PIPES
-            is_effects = False
         if event.type == INCREMENT_SCORE:
             score += 1
             if score == DEFAULT_EFFECTS_THRESHOLD:
@@ -96,6 +96,9 @@ while running:
         )
     else:
         title_screen(screen, title_buttons)
+        if score > 0:
+            score_text = font.render(f"Score : {score}", True, (255, 255, 255))
+            screen.blit(score_text, (screen.get_width() / 2 - score_text.get_width() / 2, screen.get_height() / 3))
 
     # flip() the display to put your work on screen
     pygame.display.flip()
