@@ -2,7 +2,7 @@
 Quantum Bird est un jeu de style *Flappy Bird* où le but est d'accumuler le plus de points possible en passant à travers les tuyaux. Cependant, faites gardes aux effects quantiques! Contrôlez plusieurs oiseaux représentant des qubits et voyez les effets de la superposition, l'intrication et la mesure en jeu!
 
 # Installation
-Pour installer le jeu, il suffit de cloner le dépôt GitHub. Ensuite, vous devez avoir `python` d installé (3.14 fonctionne, pas testé pour d'autres versions). Par la suite, installez les bibliothèques requises avec votre système de bibliothèque préféré, ou
+Pour installer le jeu, il suffit de cloner le dépôt GitHub. Ensuite, vous devez avoir `python` d'installé (3.14 fonctionne, pas testé pour d'autres versions). Par la suite, installez les bibliothèques requises avec votre système de bibliothèque préféré, ou
 ```
 python -m venv .venv
 ```
@@ -18,6 +18,12 @@ source .venv/bin/activate
 et
 ```
 pip install -r requirements.txt
+```
+
+# Lancement du jeu
+Pour lancer le jeu, simplement faire
+```
+python main.py
 ```
 
 # Distinctions importantes
