@@ -45,3 +45,6 @@ Après avoir atteint un score de 3, des effets apparaissent à un interval régu
 | Mesure | Mètre | Observe l'oiseau qui touche l'effet, c'est-à-dire que l'oiseau pert son effet quantique. L'oiseau disparait du jeu, et les autres oiseaux ont la touche qui les contrôle déplacé de 1 vers la gauche. |
 | Nouveau oiseau | Boule bleue | Ajoute un qubit au jeu avec une autre couleur et une autre touche qui contrôle l'oiseau. |
 | Porte CX | X avec deux couleurs | Inverse la gravité du qubit ayant la couleur du bas seulement si un oiseau choisit aléatoirement avec la couleur du haut a sa gravité inversée. |
+
+# Sources
+[https://oneminimax.github.io/assets/notes_cours/introduction%20calcul%20quantique.pdf]
